@@ -90,50 +90,7 @@ export function renderHexGrid(container) {
     });
   });
 
-  // Post-render: centre the visible hex cluster within the container
-  // This runs after DOM is built, using actual element positions
-  requestAnimationFrame(() => {
-    centerHexCluster(grid, hexElements, gridWidth);
-  });
-  // Also centre after a short delay (fallback for layout timing)
-  setTimeout(() => centerHexCluster(grid, hexElements, gridWidth), 100);
-
   return { hexElements, lineElements, crossLinks, positions, grid, svg, gridWidth, gridHeight };
-}
-
-/** Measure the visual bounding box of visible hexes and shift all positions to centre */
-function centerHexCluster(grid, hexElements, containerWidth) {
-  let minLeft = Infinity, maxRight = -Infinity;
-  hexElements.forEach(el => {
-    if (parseFloat(el.style.opacity) < 0.1) return;
-    const left = parseFloat(el.style.left);
-    const width = parseFloat(el.style.width);
-    if (!isNaN(left) && !isNaN(width)) {
-      minLeft = Math.min(minLeft, left);
-      maxRight = Math.max(maxRight, left + width);
-    }
-  });
-  if (!isFinite(minLeft)) return;
-  const clusterCentre = (minLeft + maxRight) / 2;
-  const targetCentre = containerWidth / 2;
-  const shift = targetCentre - clusterCentre;
-  if (Math.abs(shift) > 5) {
-    // Shift all hex positions
-    hexElements.forEach(el => {
-      const left = parseFloat(el.style.left);
-      if (!isNaN(left)) el.style.left = `${left + shift}px`;
-    });
-    // Shift all SVG lines
-    grid.querySelectorAll('line').forEach(line => {
-      ['x1', 'x2'].forEach(attr => {
-        const v = parseFloat(line.getAttribute(attr));
-        if (!isNaN(v)) line.setAttribute(attr, v + shift);
-      });
-    });
-    // Update the SVG viewBox to match
-    const svg = grid.querySelector('svg');
-    if (svg) svg.setAttribute('viewBox', `0 0 ${containerWidth} 700`);
-  }
 }
 
 /** Animate all hexes + lines to new positions */

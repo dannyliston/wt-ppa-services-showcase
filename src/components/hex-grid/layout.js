@@ -276,22 +276,8 @@ export function calculateFilterLayout(width, height, activeTags) {
   return fitToViewport(positions, width, height);
 }
 
-/** Fit all positions to the viewport with padding.
- *  Centres around the pillar hexes (structural anchors) rather than
- *  the bounding box of all visible nodes, which gets pulled by asymmetric branches.
- */
+/** Fit all visible positions to the viewport, centred using bounding box. */
 function fitToViewport(positions, width, height) {
-  // Find the centroid of pillar hexes (the structural centre)
-  let pillarSumX = 0, pillarSumY = 0, pillarCount = 0;
-  positions.forEach(pos => {
-    if (pos.type === 'pillar' && pos.opacity > 0.1) {
-      pillarSumX += pos.x;
-      pillarSumY += pos.y;
-      pillarCount++;
-    }
-  });
-
-  // Bounding box of ALL visible nodes (for scaling)
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
   positions.forEach(pos => {
     if (pos.opacity < 0.3) return;
@@ -313,19 +299,13 @@ function fitToViewport(positions, width, height) {
 
   const cx = width / 2;
   const cy = height / 2;
-
-  // Centre around pillar centroid
-  const anchorX = pillarCount > 0 ? pillarSumX / pillarCount : (minX + maxX) / 2;
-  const anchorY = pillarCount > 0 ? pillarSumY / pillarCount : (minY + maxY) / 2;
-  const offsetX = cx - anchorX;
-  const offsetY = cy - anchorY;
+  const bbCx = (minX + maxX) / 2;
+  const bbCy = (minY + maxY) / 2;
 
   positions.forEach(pos => {
-    // Translate so pillar centroid is at viewport centre, then scale
-    const translatedX = pos.x + offsetX;
-    const translatedY = pos.y + offsetY;
-    pos.x = cx + (translatedX - cx) * scale;
-    pos.y = cy + (translatedY - cy) * scale;
+    // Scale around bounding box centre, then translate to viewport centre
+    pos.x = cx + (pos.x - bbCx) * scale;
+    pos.y = cy + (pos.y - bbCy) * scale;
     pos.size = Math.max(Math.round(pos.size * scale), 20);
   });
 
