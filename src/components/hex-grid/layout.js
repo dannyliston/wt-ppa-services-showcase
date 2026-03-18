@@ -276,11 +276,25 @@ export function calculateFilterLayout(width, height, activeTags) {
   return fitToViewport(positions, width, height);
 }
 
-/** Fit all positions to the viewport with padding */
+/** Fit all positions to the viewport with padding.
+ *  Centres around the pillar hexes (structural anchors) rather than
+ *  the bounding box of all visible nodes, which gets pulled by asymmetric branches.
+ */
 function fitToViewport(positions, width, height) {
+  // Find the centroid of pillar hexes (the structural centre)
+  let pillarSumX = 0, pillarSumY = 0, pillarCount = 0;
+  positions.forEach(pos => {
+    if (pos.type === 'pillar' && pos.opacity > 0.1) {
+      pillarSumX += pos.x;
+      pillarSumY += pos.y;
+      pillarCount++;
+    }
+  });
+
+  // Bounding box of ALL visible nodes (for scaling)
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
   positions.forEach(pos => {
-    if (pos.opacity < 0.3) return; // Only centre around visible nodes
+    if (pos.opacity < 0.3) return;
     const pad = pos.size;
     minX = Math.min(minX, pos.x - pad);
     maxX = Math.max(maxX, pos.x + pad);
@@ -288,7 +302,7 @@ function fitToViewport(positions, width, height) {
     maxY = Math.max(maxY, pos.y + pad);
   });
 
-  if (!isFinite(minX)) return positions; // All hidden
+  if (!isFinite(minX)) return positions;
 
   const gridW = maxX - minX;
   const gridH = maxY - minY;
@@ -299,14 +313,19 @@ function fitToViewport(positions, width, height) {
 
   const cx = width / 2;
   const cy = height / 2;
-  const gridCx = (minX + maxX) / 2;
-  const gridCy = (minY + maxY) / 2;
-  const offsetX = cx - gridCx;
-  const offsetY = cy - gridCy;
+
+  // Centre around pillar centroid
+  const anchorX = pillarCount > 0 ? pillarSumX / pillarCount : (minX + maxX) / 2;
+  const anchorY = pillarCount > 0 ? pillarSumY / pillarCount : (minY + maxY) / 2;
+  const offsetX = cx - anchorX;
+  const offsetY = cy - anchorY;
 
   positions.forEach(pos => {
-    pos.x = cx + (pos.x + offsetX - cx) * scale;
-    pos.y = cy + (pos.y + offsetY - cy) * scale;
+    // Translate so pillar centroid is at viewport centre, then scale
+    const translatedX = pos.x + offsetX;
+    const translatedY = pos.y + offsetY;
+    pos.x = cx + (translatedX - cx) * scale;
+    pos.y = cy + (translatedY - cy) * scale;
     pos.size = Math.max(Math.round(pos.size * scale), 20);
   });
 
