@@ -31,7 +31,7 @@ function render(serviceId) {
   const inner = panelEl.querySelector('.detail-panel__inner');
 
   inner.innerHTML = `
-    <div class="detail-panel__badge">${pillar?.name || ''}</div>
+    <div class="detail-panel__badge detail-panel__badge--${pillar?.id || ''}">${pillar?.name || ''}</div>
     <h2 class="detail-panel__name">${svc.name}</h2>
     <div class="detail-panel__tags">
       ${svc.tags.map(t => `<span class="detail-panel__tag detail-panel__tag--${t}">${t}</span>`).join('')}

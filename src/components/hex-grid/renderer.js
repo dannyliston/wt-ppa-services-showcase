@@ -23,10 +23,21 @@ export function renderHexGrid(container) {
   const hexElements = new Map();
   const lineElements = [];
 
+  // Build a lookup: id → pillarId (for branch colouring)
+  const branchOf = {};
+  pillars.forEach(p => { branchOf[p.id] = p.id; });
+  categories.forEach(c => { branchOf[c.id] = c.pillarId; });
+  services.forEach(s => {
+    const cat = categories.find(c => c.id === s.categoryId);
+    if (cat) branchOf[s.id] = cat.pillarId;
+  });
+
   // Pillar hexes
   pillars.forEach(p => {
     const pos = positions.get(p.id);
     const el = makeHex(p.id, p.name, pos, 'pillar', p.tagline);
+    el.classList.add(`hex--branch-${p.id}`);
+    el.dataset.pillar = p.id;
     grid.appendChild(el);
     hexElements.set(p.id, el);
   });
@@ -35,9 +46,11 @@ export function renderHexGrid(container) {
   categories.forEach(cat => {
     const pos = positions.get(cat.id);
     const el = makeHex(cat.id, cat.name, pos, 'category');
+    el.classList.add(`hex--branch-${cat.pillarId}`);
     grid.appendChild(el);
     hexElements.set(cat.id, el);
     const line = makeLine(svg, positions.get(cat.pillarId), pos);
+    line.classList.add(`line--${cat.pillarId}`);
     lineElements.push({ line, from: cat.pillarId, to: cat.id });
   });
 
@@ -45,13 +58,17 @@ export function renderHexGrid(container) {
   services.forEach(svc => {
     const pos = positions.get(svc.id);
     if (!pos) return;
+    const cat = categories.find(c => c.id === svc.categoryId);
+    const branch = cat ? cat.pillarId : 'clarity';
     const el = makeHex(svc.id, svc.name, pos, 'service');
+    el.classList.add(`hex--branch-${branch}`);
     if (svc.digital) el.classList.add('hex--digital');
     grid.appendChild(el);
     hexElements.set(svc.id, el);
     const parentPos = positions.get(svc.categoryId);
     if (parentPos) {
       const line = makeLine(svg, parentPos, pos);
+      line.classList.add(`line--${branch}`);
       lineElements.push({ line, from: svc.categoryId, to: svc.id });
     }
   });
@@ -174,15 +191,27 @@ function makeLine(svg, from, to, isCross = false) {
   return line;
 }
 
-/** Calculate the point on a hex edge closest to a target point.
- * Hex uses pointy-top orientation matching our clip-path:
- * polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)
+/**
+ * Calculate the point on a hex edge closest to a target point.
+ * Our hex clip-path is pointy-top:
+ *   polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)
+ * The DOM element is (size*2) x (size*2) px, so visual radius ≈ size.
+ *
+ * For a regular pointy-top hexagon, the distance from centre to edge
+ * varies with angle. We use the proper hex edge intersection formula.
  */
-function hexEdgePoint(cx, cy, radius, targetX, targetY) {
+function hexEdgePoint(cx, cy, dataSize, targetX, targetY) {
   const angle = Math.atan2(targetY - cy, targetX - cx);
-  // Hex edge distance varies with angle — use the hex geometry
-  // For a pointy-top hex, the distance from centre to edge at angle θ:
-  const r = radius * 0.85; // Slightly inside the visual boundary
+  // Visual radius of the hex (half of element width)
+  const R = dataSize;
+  // Pointy-top hex: vertices at 0°, 60°, 120°, 180°, 240°, 300° (rotated -90°)
+  // Edge distance for pointy-top hex at angle θ:
+  //   r(θ) = R * cos(30°) / cos(θ mod 60° - 30°)
+  // cos(30°) ≈ 0.866
+  const sector = ((angle % (Math.PI / 3)) + Math.PI / 3) % (Math.PI / 3);
+  const edgeDist = (R * 0.866) / Math.cos(sector - Math.PI / 6);
+  // Clamp and scale slightly inward so lines don't overlap the border
+  const r = Math.min(edgeDist, R) * 0.92;
   return {
     x: cx + Math.cos(angle) * r,
     y: cy + Math.sin(angle) * r,
