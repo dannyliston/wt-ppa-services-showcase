@@ -1,7 +1,7 @@
 import { getState, setState, subscribe } from '../../utils/state.js';
 import { categories, services } from '../../data/services.js';
 import { sectorServiceMap } from '../../data/sectors.js';
-import { calculateLayout, calculatePillarFocusLayout, calculateCategoryFocusLayout } from './layout.js';
+import { calculateLayout, calculatePillarFocusLayout, calculateCategoryFocusLayout, calculateFilterLayout } from './layout.js';
 import { animateToPositions, getGridDimensions } from './renderer.js';
 
 let _hexElements, _lineElements, _crossLinks, _grid;
@@ -25,7 +25,7 @@ export function initHexInteractions(hexElements, lineElements, crossLinks, grid)
   });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') resetToDefault(); });
 
-  subscribe('hex-vis', (state) => applyFilters(state));
+  subscribe('hex-vis', (state) => applyState(state));
 }
 
 function handleClick(id) {
@@ -36,30 +36,25 @@ function handleClick(id) {
 
   if (type === 'pillar') {
     if (state.focusedPillar === id) {
-      // Collapse back
       resetToDefault();
     } else {
-      // Expand this pillar's branch
       const newPos = calculatePillarFocusLayout(width, height, id);
       animateToPositions(newPos, _hexElements, _lineElements, _crossLinks);
-      setState({ focusedPillar: id, focusedCategory: null, selectedService: null, detailPanelOpen: false });
+      setState({ focusedPillar: id, focusedCategory: null, selectedService: null, detailPanelOpen: false, activeFilters: [] });
     }
   } else if (type === 'category') {
     if (state.focusedCategory === id) {
-      // Go back to pillar focus
       const cat = categories.find(c => c.id === id);
       const newPos = calculatePillarFocusLayout(width, height, cat.pillarId);
       animateToPositions(newPos, _hexElements, _lineElements, _crossLinks);
       setState({ focusedCategory: null });
     } else {
-      // Expand this category
       const newPos = calculateCategoryFocusLayout(width, height, id);
       animateToPositions(newPos, _hexElements, _lineElements, _crossLinks);
       const cat = categories.find(c => c.id === id);
       setState({ focusedPillar: cat.pillarId, focusedCategory: id });
     }
   } else if (type === 'service') {
-    if (el.classList.contains('hex--dimmed')) setState({ activeFilters: [] });
     setState({ selectedService: id, detailPanelOpen: true });
   }
 }
@@ -68,34 +63,38 @@ function resetToDefault() {
   const { width, height } = getGridDimensions();
   const newPos = calculateLayout(width, height);
   animateToPositions(newPos, _hexElements, _lineElements, _crossLinks);
-  setState({ focusedPillar: null, focusedCategory: null, selectedService: null, detailPanelOpen: false });
+  setState({ focusedPillar: null, focusedCategory: null, selectedService: null, detailPanelOpen: false, activeFilters: [] });
 }
 
-function applyFilters(state) {
-  const { selectedService, detailPanelOpen, activeFilters, toggles } = state;
-  const sectorServices = toggles.sectorLens ? (sectorServiceMap[toggles.sectorLens] || []) : null;
+/** Called when filters change — triggers layout recalculation */
+export function applyFilterLayout(activeFilters) {
+  const { width, height } = getGridDimensions();
+  if (activeFilters.length === 0) {
+    // No filters — go back to default or current focus
+    const state = getState();
+    if (state.focusedPillar) {
+      const newPos = calculatePillarFocusLayout(width, height, state.focusedPillar);
+      animateToPositions(newPos, _hexElements, _lineElements, _crossLinks);
+    } else {
+      const newPos = calculateLayout(width, height);
+      animateToPositions(newPos, _hexElements, _lineElements, _crossLinks);
+    }
+  } else {
+    // Filter active — show cross-cutting filter view
+    const newPos = calculateFilterLayout(width, height, activeFilters);
+    animateToPositions(newPos, _hexElements, _lineElements, _crossLinks);
+  }
+}
+
+function applyState(state) {
+  const { selectedService, detailPanelOpen, toggles } = state;
 
   const grid = document.getElementById('hex-grid');
   if (grid) grid.classList.toggle('hex-grid--shifted', detailPanelOpen);
 
+  // Digital highlight
   _hexElements.forEach((el, id) => {
-    const type = el.dataset.type;
-    let dimmed = false;
-
-    // Tag filters (services only)
-    if (activeFilters.length > 0 && type === 'service') {
-      const svc = services.find(s => s.id === id);
-      if (svc && !activeFilters.some(f => svc.tags.includes(f))) dimmed = true;
-    }
-
-    // Sector lens (services only)
-    if (sectorServices && type === 'service') {
-      if (!sectorServices.includes(id)) dimmed = true;
-    }
-
-    // Digital highlight
     el.classList.toggle('digital-active', !!toggles.digitalHighlight);
-    el.classList.toggle('hex--dimmed', dimmed);
     el.classList.toggle('hex--selected', id === selectedService);
   });
 }

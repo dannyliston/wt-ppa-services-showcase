@@ -82,14 +82,14 @@ export const services = [
   },
   {
     id: 'portfolio-management', name: 'Portfolio Management', categoryId: 'portfolio-program-mgmt',
-    tags: ['people', 'process'], digital: false, contactId: 'peter-cosman',
+    tags: ['people', 'process'], digital: false, contactId: 'kristian-lojszczyk',
     valueStatement: 'Strategic portfolio oversight that maximises capital performance.',
     bullets: ['Portfolio prioritisation and optimisation', 'Capital planning', 'Benefits realisation', 'Portfolio performance monitoring'],
     relatedIds: ['program-management', 'reporting', 'maturity-assessments'],
   },
   {
     id: 'program-management', name: 'Program Management', categoryId: 'portfolio-program-mgmt',
-    tags: ['people', 'process'], digital: false, contactId: 'peter-cosman',
+    tags: ['people', 'process'], digital: false, contactId: 'kristian-lojszczyk',
     valueStatement: 'Hands-on program leadership from mobilisation through to delivery.',
     bullets: ['Program setup and mobilisation', 'Program delivery oversight', 'Interdependency management', 'Stakeholder management'],
     relatedIds: ['portfolio-management', 'planning', 'change-management'],
@@ -162,9 +162,9 @@ export const services = [
 export const contacts = [
   { id: 'adam-robinson', name: 'Adam Robinson', role: 'Head of Portfolio & Program Advisory', email: 'arobinson@wtpartnership.com.au' },
   { id: 'danny-liston', name: 'Danny Liston', role: 'NSW State Lead & Digital Services Lead', email: 'dliston@wtpartnership.com.au' },
-  { id: 'peter-cosman', name: 'Peter Cosman', role: 'VIC & SA State Lead', email: 'pcosman@wtpartnership.com.au' },
-  { id: 'jared-cathcart', name: 'Jared Cathcart', role: 'QLD & WA State Lead', email: 'jcathcart@wtpartnership.com.au' },
   { id: 'david-mackinder', name: 'David Mackinder', role: 'Planning Services Lead', email: 'dmackinder@wtpartnership.com.au' },
+  { id: 'jared-cathcart', name: 'Jared Cathcart', role: 'QLD & WA State Lead', email: 'jcathcart@wtpartnership.com.au' },
+  { id: 'kristian-lojszczyk', name: 'Kristian Lojszczyk', role: 'Associate Director, VIC', email: 'klojszczyk@wtpartnership.com.au' },
   { id: 'rachael-mccool', name: 'Rachael Mccool', role: 'Change Management Lead', email: 'rmccool@wtpartnership.com.au' },
   { id: 'latham-conley', name: 'Latham Conley', role: 'Risk Management Lead', email: 'lconley@wtpartnership.com.au' },
 ];

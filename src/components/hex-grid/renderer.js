@@ -95,30 +95,33 @@ export function animateToPositions(newPositions, hexElements, lineElements, cros
     el.classList.toggle('hex--hidden', pos.opacity <= 0.05);
   });
 
-  // Update hierarchy lines
+  // Update hierarchy lines with edge points
   lineElements.forEach(({ line, from, to }) => {
     const fp = newPositions.get(from);
     const tp = newPositions.get(to);
     if (!fp || !tp) return;
     line.style.transition = `all ${duration}ms cubic-bezier(0.16,1,0.3,1)`;
-    line.setAttribute('x1', fp.x);
-    line.setAttribute('y1', fp.y);
-    line.setAttribute('x2', tp.x);
-    line.setAttribute('y2', tp.y);
-    // Show line only if both endpoints are visible
+    const p1 = hexEdgePoint(fp.x, fp.y, fp.size, tp.x, tp.y);
+    const p2 = hexEdgePoint(tp.x, tp.y, tp.size, fp.x, fp.y);
+    line.setAttribute('x1', p1.x);
+    line.setAttribute('y1', p1.y);
+    line.setAttribute('x2', p2.x);
+    line.setAttribute('y2', p2.y);
     const visible = fp.opacity > 0.1 && tp.opacity > 0.1;
     line.classList.toggle('visible', visible);
   });
 
-  // Update cross-links
+  // Update cross-links with edge points
   crossLinks.forEach(({ line, from, to }) => {
     const fp = newPositions.get(from);
     const tp = newPositions.get(to);
     if (!fp || !tp) return;
-    line.setAttribute('x1', fp.x);
-    line.setAttribute('y1', fp.y);
-    line.setAttribute('x2', tp.x);
-    line.setAttribute('y2', tp.y);
+    const p1 = hexEdgePoint(fp.x, fp.y, fp.size, tp.x, tp.y);
+    const p2 = hexEdgePoint(tp.x, tp.y, tp.size, fp.x, fp.y);
+    line.setAttribute('x1', p1.x);
+    line.setAttribute('y1', p1.y);
+    line.setAttribute('x2', p2.x);
+    line.setAttribute('y2', p2.y);
   });
 
   // Clean up transitions after animation
@@ -159,11 +162,29 @@ function makeHex(id, label, pos, type, tagline) {
 
 function makeLine(svg, from, to, isCross = false) {
   const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-  line.setAttribute('x1', from.x);
-  line.setAttribute('y1', from.y);
-  line.setAttribute('x2', to.x);
-  line.setAttribute('y2', to.y);
+  // Calculate edge points instead of centres
+  const p1 = hexEdgePoint(from.x, from.y, from.size, to.x, to.y);
+  const p2 = hexEdgePoint(to.x, to.y, to.size, from.x, from.y);
+  line.setAttribute('x1', p1.x);
+  line.setAttribute('y1', p1.y);
+  line.setAttribute('x2', p2.x);
+  line.setAttribute('y2', p2.y);
   if (isCross) line.classList.add('cross-link');
   svg.appendChild(line);
   return line;
+}
+
+/** Calculate the point on a hex edge closest to a target point.
+ * Hex uses pointy-top orientation matching our clip-path:
+ * polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)
+ */
+function hexEdgePoint(cx, cy, radius, targetX, targetY) {
+  const angle = Math.atan2(targetY - cy, targetX - cx);
+  // Hex edge distance varies with angle — use the hex geometry
+  // For a pointy-top hex, the distance from centre to edge at angle θ:
+  const r = radius * 0.85; // Slightly inside the visual boundary
+  return {
+    x: cx + Math.cos(angle) * r,
+    y: cy + Math.sin(angle) * r,
+  };
 }

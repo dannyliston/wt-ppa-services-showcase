@@ -185,11 +185,102 @@ export function calculateCategoryFocusLayout(width, height, focusedCategoryId) {
   return fitToViewport(positions, width, height);
 }
 
+/**
+ * Filter layout: shows all services matching given tags, expanded from their categories.
+ * All pillars visible. Categories with matching services expand; others dim.
+ * This is a cross-cutting view across the whole hierarchy.
+ */
+export function calculateFilterLayout(width, height, activeTags) {
+  const positions = new Map();
+  const cx = width / 2;
+  const cy = height / 2;
+
+  // All pillars in their standard triangle but slightly wider
+  const pillarRadius = 100;
+  pillars.forEach(p => {
+    const a = pillarAngles[p.id];
+    positions.set(p.id, {
+      x: cx + Math.cos(a) * pillarRadius,
+      y: cy + Math.sin(a) * pillarRadius,
+      size: HEX_SIZES.pillar, type: 'pillar', opacity: 1,
+    });
+  });
+
+  // Determine which services match the filter
+  const matchingServiceIds = new Set();
+  services.forEach(svc => {
+    if (activeTags.some(t => svc.tags.includes(t))) {
+      matchingServiceIds.add(svc.id);
+    }
+  });
+
+  // Determine which categories have matching services
+  const activeCategoryIds = new Set();
+  services.forEach(svc => {
+    if (matchingServiceIds.has(svc.id)) activeCategoryIds.add(svc.categoryId);
+  });
+
+  // Categories
+  const catSpread = 160;
+  Object.entries(catsByPillar).forEach(([pid, cats]) => {
+    const pp = positions.get(pid);
+    const baseAngle = pillarAngles[pid];
+    const span = cats.length <= 2 ? Math.PI * 0.5 : Math.PI * 0.7;
+    const start = baseAngle - span / 2;
+    cats.forEach((cat, i) => {
+      const a = cats.length === 1 ? baseAngle : start + (i / (cats.length - 1)) * span;
+      const hasMatch = activeCategoryIds.has(cat.id);
+      positions.set(cat.id, {
+        x: pp.x + Math.cos(a) * catSpread,
+        y: pp.y + Math.sin(a) * catSpread,
+        size: HEX_SIZES.category, type: 'category',
+        opacity: hasMatch ? 1 : 0.2,
+      });
+    });
+  });
+
+  // Services — expand matching ones, hide non-matching
+  Object.entries(svcsByCat).forEach(([cid, svcs]) => {
+    const cp = positions.get(cid);
+    if (!cp) return;
+    const cat = categories.find(c => c.id === cid);
+    const pp = positions.get(cat.pillarId);
+    const outAngle = Math.atan2(cp.y - pp.y, cp.x - pp.x);
+
+    // Only fan out matching services
+    const matchingSvcs = svcs.filter(s => matchingServiceIds.has(s.id));
+    const svcSpread = 95;
+    const svcSpan = Math.PI * (0.2 + matchingSvcs.length * 0.12);
+    const svcStart = outAngle - svcSpan / 2;
+
+    let matchIdx = 0;
+    svcs.forEach(svc => {
+      if (matchingServiceIds.has(svc.id)) {
+        const a = matchingSvcs.length === 1 ? outAngle : svcStart + (matchIdx / Math.max(matchingSvcs.length - 1, 1)) * svcSpan;
+        positions.set(svc.id, {
+          x: cp.x + Math.cos(a) * svcSpread,
+          y: cp.y + Math.sin(a) * svcSpread,
+          size: HEX_SIZES.service, type: 'service', opacity: 1,
+        });
+        matchIdx++;
+      } else {
+        // Non-matching: collapse to category position
+        positions.set(svc.id, {
+          x: cp.x, y: cp.y,
+          size: Math.round(HEX_SIZES.service * 0.5), type: 'service', opacity: 0,
+        });
+      }
+    });
+  });
+
+  return fitToViewport(positions, width, height);
+}
+
 /** Fit all positions to the viewport with padding */
 function fitToViewport(positions, width, height) {
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
   positions.forEach(pos => {
-    if (pos.opacity <= 0) return; // Skip hidden nodes for bounding
+    if (pos.opacity < 0.3) return; // Only centre around visible nodes
     const pad = pos.size;
     minX = Math.min(minX, pos.x - pad);
     maxX = Math.max(maxX, pos.x + pad);

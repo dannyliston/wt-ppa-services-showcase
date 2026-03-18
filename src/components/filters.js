@@ -1,4 +1,5 @@
 import { getState, setState, subscribe } from '../utils/state.js';
+import { applyFilterLayout } from './hex-grid/interactions.js';
 
 export function renderFilters(container) {
   const div = document.createElement('div');
@@ -14,7 +15,9 @@ export function renderFilters(container) {
       const filters = [...getState().activeFilters];
       const idx = filters.indexOf(tag);
       if (idx >= 0) filters.splice(idx, 1); else filters.push(tag);
-      setState({ activeFilters: filters });
+      setState({ activeFilters: filters, focusedPillar: null, focusedCategory: null });
+      // Trigger layout recalculation
+      applyFilterLayout(filters);
     });
   });
 
