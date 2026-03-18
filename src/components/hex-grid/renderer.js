@@ -5,7 +5,7 @@ let gridWidth = 1280;
 let gridHeight = 700;
 
 export function renderHexGrid(container) {
-  gridWidth = container.clientWidth || 1280;
+  gridWidth = container.clientWidth || container.parentElement?.clientWidth || window.innerWidth || 1280;
   gridHeight = 700;
 
   const grid = document.createElement('div');

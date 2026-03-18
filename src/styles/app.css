@@ -61,6 +61,7 @@ a:hover { color: var(--wt-yellow); }
   border-bottom: 1px solid var(--glass-border);
 }
 .header__logo { display: flex; align-items: center; gap: 16px; }
+.header__logo-img { height: 44px; width: auto; }
 .header__logo-mark {
   width: 48px; height: 48px; background: var(--wt-yellow);
   display: flex; align-items: center; justify-content: center;
@@ -98,8 +99,10 @@ a:hover { color: var(--wt-yellow); }
 /* --- Hex Grid Section --- */
 .hex-section {
   position: relative; width: 100%; min-height: 720px;
-  display: flex; align-items: center; justify-content: center;
-  overflow: hidden; max-width: 100vw;
+  overflow: hidden;
+}
+.hex-grid-container {
+  width: 100%; height: 700px; position: relative; z-index: 2; overflow: hidden;
 }
 .hex-canvas {
   position: absolute; inset: 0; z-index: 0; pointer-events: none;
@@ -107,13 +110,13 @@ a:hover { color: var(--wt-yellow); }
 .hex-grid {
   position: relative; width: 100%; height: 700px;
   transition: transform var(--transition-slow);
-  z-index: 2;
+  z-index: 2; overflow: hidden;
 }
 .hex-grid--shifted { transform: translateX(-22%) scale(0.78); }
 
 .hex-grid__svg {
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  pointer-events: none; z-index: 1;
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 1; overflow: visible;
 }
 .hex-grid__svg line {
   stroke: var(--wt-blue); stroke-width: 1; opacity: 0;
@@ -467,6 +470,7 @@ a:hover { color: var(--wt-yellow); }
   padding: 28px 40px; border-top: 1px solid var(--glass-border);
   font-size: 0.75rem; color: var(--text-secondary);
 }
+.footer__logo-img { height: 28px; width: auto; }
 .footer__tagline { color: var(--wt-yellow); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; font-size: 0.65rem; }
 
 /* --- Guided Tour --- */

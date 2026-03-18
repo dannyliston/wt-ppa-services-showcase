@@ -12,6 +12,7 @@ import { renderCaseStudies } from './components/case-studies.js';
 import { renderContacts } from './components/contacts.js';
 import { detectLowPerformance } from './utils/perf.js';
 import { pillars, categories, services } from './data/services.js';
+import wtLogoUrl from './assets/wt-logo.svg';
 
 document.addEventListener('DOMContentLoaded', () => {
   detectLowPerformance();
@@ -20,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
   app.innerHTML = `
     <header class="header">
       <div class="header__logo">
-        <div class="header__logo-mark">WT</div>
+        <img src="${wtLogoUrl}" alt="WT Partnership" class="header__logo-img" />
         <div>
           <div class="header__title">Portfolio & Program Advisory</div>
           <div class="header__tagline">Empowering growth.</div>
@@ -31,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <main>
       <section class="hex-section" id="hex-section">
         <canvas class="hex-canvas" id="particle-canvas"></canvas>
-        <div id="hex-grid-container" style="width:100%;max-width:100vw;height:700px;position:relative;z-index:2;overflow:hidden;"></div>
+        <div id="hex-grid-container" class="hex-grid-container"></div>
       </section>
 
       <div id="stats-container"></div>
@@ -40,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </main>
 
     <footer class="footer">
-      <div class="header__logo-mark" style="width:36px;height:36px;font-size:13px;">WT</div>
+      <img src="${wtLogoUrl}" alt="WT" class="footer__logo-img" />
       <span class="footer__tagline">Empowering growth.</span>
       <span>&copy; ${new Date().getFullYear()} WT Partnership</span>
     </footer>

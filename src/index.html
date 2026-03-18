@@ -8,10 +8,7 @@
     body { background: #0A0F1A; margin: 0; }
     .loader { display: flex; align-items: center; justify-content: center;
       height: 100vh; gap: 8px; flex-direction: column; }
-    .loader__mark { width: 56px; height: 56px; background: #FFC200;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 22px; color: #0A0F1A;
-      font-family: sans-serif; margin-bottom: 24px; }
+    .loader__mark { margin-bottom: 24px; }
     .loader__dots { display: flex; gap: 8px; }
     .loader-dot { width: 6px; height: 6px; border-radius: 50%;
       background: #FFC200; animation: pulse 1.4s ease-in-out infinite; }
@@ -23,7 +20,7 @@
 </head>
 <body>
   <div id="loader" class="loader">
-    <div class="loader__mark">WT</div>
+    <div class="loader__mark"><svg width="60" height="48" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M100 0H0v79.138h100V0Z" fill="#FFC425"/><path d="M60.79 19.384 50.13 57.15h-.122l-10.72-37.765h-5.056L23.33 57.15h-.122L12.731 19.384H8.406L20.588 61.9h5.056l10.964-37.765h.122L47.51 61.9h4.995L64.81 19.384h-4.02Z" fill="#0065A4"/><path d="M62.312 19.384v3.655h12.532v38.86h4.218V23.04h12.533v-3.655H62.312Z" fill="#0065A4"/></svg></div>
     <div class="loader__dots">
       <div class="loader-dot"></div>
       <div class="loader-dot"></div>
