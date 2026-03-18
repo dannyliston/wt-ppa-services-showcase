@@ -19,10 +19,18 @@ Internal WT staff browsing the SharePoint intranet. The goal is to make PPA's se
 
 ## Tech Stack
 
-- **Framework:** Vanilla HTML/CSS/JS or lightweight framework (e.g. Vite + vanilla JS)
-- **Animations:** CSS animations + a lightweight library (GSAP or anime.js) for the hex grid assembly, transitions, and particle effects
-- **No heavy frameworks** (React, Vue, etc.) — unnecessary complexity for a static showcase
-- **Responsive:** Must work on desktop (primary) and tablet. Mobile is a nice-to-have but not critical for a SharePoint embed
+- **Build tool:** Vite (vanilla JS — no React/Vue)
+- **Animations:** GSAP (core + ScrollTrigger) for hex grid assembly, transitions, and orchestrated sequences. CSS transitions for simple hover/toggle states.
+- **Particle effects:** Lightweight canvas-based implementation (custom or tsParticles)
+- **No heavy frameworks** (React, Vue, etc.) — unnecessary complexity for a static showcase. Alpine.js is acceptable if lightweight reactivity is needed for filter/toggle state.
+- **Responsive:** Desktop-first. Must work at 1280px+ (primary) and 768px+ (tablet). Below 768px: graceful fallback showing a simplified vertical layout of the service hierarchy without the hex grid.
+
+### Breakpoints
+| Breakpoint | Behaviour |
+|------------|-----------|
+| ≥1280px | Full hex grid experience |
+| 768–1279px | Hex grid scales down, detail panel overlays instead of side-panel |
+| <768px | Fallback: vertical accordion layout of 3 C's → categories → services. No hex grid. |
 
 ## Colour Palette
 
@@ -220,6 +228,47 @@ Tag mapping:
 | Process Improvement | | x | |
 | Templates & Methodologies | | x | x |
 
+### Contact-to-Service Map
+
+| Contact | Service Areas |
+|---------|--------------|
+| Adam Robinson | All (Head of PPA) — shown as fallback when no specific lead applies |
+| Danny Liston | Reporting, Data & Analytics, AI & Future Working Methods, Digital Transformation, Templates & Methodologies |
+| David Mackinder | Planning |
+| Rachael Mccool | Change Management |
+| Latham Conley | Risk Management |
+| Peter Cosman | Portfolio Management, Program Management (VIC/SA) |
+| Jared Cathcart | Portfolio Management, Program Management (QLD/WA) |
+
+For services without a specific lead (Maturity Assessments, Target Operating Model, Training & Development, Governance Frameworks, PM Frameworks, Process Improvement, Health Checks, Gateway Reviews, Independent Assurance, Cost & Change Control), show Adam Robinson as the contact.
+
+### Related Services Map
+
+Cross-C connections that appear in the detail panel's "Related services" section and in the Connections View toggle:
+
+| Service | Related Services |
+|---------|-----------------|
+| Risk Management | Governance Frameworks, Planning, Health Checks |
+| Planning | Risk Management, Cost & Change Control, Program Management |
+| Cost & Change Control | Planning, Governance Frameworks, Reporting |
+| Reporting | Data & Analytics, Portfolio Management, Cost & Change Control |
+| Data & Analytics | Reporting, AI & Future Working Methods |
+| AI & Future Working Methods | Data & Analytics, Digital Transformation, Reporting |
+| Health Checks | Gateway Reviews, Independent Assurance, Risk Management |
+| Gateway Reviews | Health Checks, Governance Frameworks, PM Frameworks |
+| Independent Assurance | Health Checks, Gateway Reviews, Governance Frameworks |
+| Portfolio Management | Program Management, Reporting, Maturity Assessments |
+| Program Management | Portfolio Management, Planning, Change Management |
+| Maturity Assessments | Target Operating Model, Process Improvement, Portfolio Management |
+| Target Operating Model | Maturity Assessments, Governance Frameworks, PM Frameworks |
+| Training & Development | Change Management, Maturity Assessments |
+| Change Management | Training & Development, Program Management, Digital Transformation |
+| Digital Transformation | AI & Future Working Methods, Change Management, Templates & Methodologies |
+| Governance Frameworks | PM Frameworks, Risk Management, Target Operating Model |
+| PM Frameworks | Governance Frameworks, Gateway Reviews, Templates & Methodologies |
+| Process Improvement | Maturity Assessments, Templates & Methodologies, Governance Frameworks |
+| Templates & Methodologies | PM Frameworks, Process Improvement, Digital Transformation |
+
 ### Sector List (for Sector Lens toggle)
 
 Aviation, Commercial & Workplace, Data Centres, Defence, Education, Energy, Healthcare, Hotels & Entertainment, Industrial & Logistics, Life Sciences, Mixed Use, Public & Civic, Residential, Retail, Sports & Venues, Transport, Water
@@ -238,9 +287,16 @@ Sector-to-service mapping is placeholder data for now — will be populated late
 The centrepiece of the page. Full-width, generous height.
 
 #### Hex Grid Layout
+
+The grid is organic and asymmetric — the 3 C's have different numbers of children and that's fine. The layout should feel natural, like a network graph, not forced into rigid symmetry.
+
 - **Centre cluster:** Three slightly larger hexes for Clarity, Capability, Consistency — arranged in a tight triangle. Each hex has the C name and its tagline. WT Yellow border/glow treatment.
-- **Middle ring:** Service category hexes (Project Controls, Tools & Insights, Assurance, Portfolio & Program Mgmt, PMO Advisory, Change & Transformation, Governance & Process) radiating from their parent C. Connected to parent by thin animated lines. WT Blue treatment.
-- **Outer ring:** Individual service hexes radiating from their parent category. Slightly smaller. Connected by thinner lines. Lighter treatment (Process Blue or Blue Grey).
+  - Clarity (top) — 3 categories, 9 services
+  - Capability (bottom-left) — 2 categories, 5 services
+  - Consistency (bottom-right) — 2 categories, 6 services
+- **Middle ring:** Service category hexes radiating from their parent C. Connected to parent by thin animated lines. WT Blue treatment. Positioned using force-directed layout logic — categories space themselves evenly around their parent C with enough room for their children.
+- **Outer ring:** Individual service hexes radiating from their parent category. ~70% the size of category hexes. Connected by thinner lines. Process Blue or Blue Grey treatment.
+- **Total hex count:** 3 (C's) + 7 (categories) + 20 (services) = 30 hexes. The grid should fit comfortably within a 1280x700px viewport without scrolling.
 
 #### Entrance Animation
 On page load, the grid assembles:
@@ -253,9 +309,9 @@ On page load, the grid assembles:
 
 #### Interaction — Base Experience
 - **Hover on any hex:** Subtle glow intensifies, hex lifts slightly (scale + shadow), connected lines brighten
-- **Click a C hex:** Zooms/focuses on that C's branch, other branches dim. Click again or click background to reset.
-- **Click a service category hex:** Expands to show its child services more prominently
-- **Click an individual service hex:** Grid compresses to the left, detail panel slides in from the right
+- **Click a C hex:** Other branches fade to 20% opacity and scale down slightly. The clicked C's branch recentres in the viewport via smooth transform (no actual zoom/scale — just translate + opacity changes). Click the same C again, click the background, or press Escape to reset.
+- **Click a service category hex:** Its child service hexes pulse and brighten. If children were too tightly packed, they spread slightly for legibility.
+- **Click an individual service hex:** The entire grid smoothly translates left (transform: translateX) to occupy ~45% of the viewport width, scaling down proportionally. The detail panel slides in from the right to fill the remaining ~55%. No hexes are removed or repositioned — it's a single transform on the grid container.
 
 #### Detail Panel
 - Appears on right side when a service is clicked
@@ -264,10 +320,10 @@ On page load, the grid assembles:
   - Service name (large)
   - Parent C badge (small coloured tag)
   - People/Process/Technology tags
-  - Value statement (one sentence)
-  - Bullet points (the detailed offerings)
-  - "Related services" — small clickable hex icons for connected services
-  - Contact — relevant team lead for that service area
+  - Value statement (one sentence — placeholder text for now, to be replaced with real copy)
+  - Bullet points (the detailed offerings — content defined in Information Architecture section)
+  - "Related services" — small clickable hex icons for connected services (see Related Services Map below)
+  - Contact — relevant team lead for that service area (see Contact-to-Service Map below)
 - Close button or click outside to dismiss
 - Transitions seamlessly if you click a related service (panel content swaps with animation)
 
@@ -280,7 +336,7 @@ On page load, the grid assembles:
 - Smooth animation on filter toggle (~300ms)
 
 ### 3. Toggle Controls Panel
-A small collapsible control bar (icon in top-right or bottom-right of the hex section). Expands to reveal toggles:
+A small collapsible control bar anchored to the **bottom-right** of the hex section (avoids competing with the header, stays out of the way of the grid). A small gear/settings icon that expands upward into a vertical pill-shaped panel with toggle switches. Collapses back to the icon when not in use.
 
 #### Connections View
 - Shows dependency/relationship lines between services across different C's
@@ -326,8 +382,9 @@ A small collapsible control bar (icon in top-right or bottom-right of the hex se
   - Location
   - Sector tag
   - Service tags (which PPA services were involved)
-- Click a card: expands to show more detail (placeholder content for now)
+- Click a card: expands as a modal overlay (dark glassmorphism, same treatment as detail panel) with placeholder content. Does not push other cards.
 - Bonus interaction: clicking a case study highlights the relevant service hexes in the grid above (scroll-to + highlight animation)
+- Case study-to-service mapping: placeholder data for now (listed under Out of Scope)
 
 #### Placeholder Case Studies (from PDF)
 - Citadel | Global
@@ -383,9 +440,40 @@ A small collapsible control bar (icon in top-right or bottom-right of the hex se
 - No animation for animation's sake — everything should feel intentional and purposeful
 - Respect `prefers-reduced-motion` media query
 
+## Interaction Edge Cases
+
+### Filter + Toggle Combinations
+- **People/Process/Tech filter + Sector Lens:** Combined as intersection. A hex must match both the active filter AND the selected sector to remain highlighted. If no hexes match, show a subtle "No matching services" message.
+- **People/Process/Tech filter + Connections View:** Only show connection lines between currently highlighted (non-dimmed) hexes.
+- **Any filter/toggle + Guided Tour:** Starting the tour resets all active filters and toggles. Tour has exclusive control.
+- **Dimmed hexes are still clickable.** Clicking a dimmed hex opens its detail panel and simultaneously clears the active filter. This prevents dead zones.
+
+### Detail Panel States
+- **Detail panel open + filter toggled:** Panel stays open. If the currently shown service becomes dimmed by the filter, panel remains but a subtle indicator shows it's outside the current filter.
+- **Detail panel open + click another service:** Panel content cross-fades to the new service (no close/reopen).
+- **Detail panel open + Escape key or click background:** Panel slides out, grid translates back to centre.
+
+### Guided Tour Interruption
+- **Click a hex mid-tour:** Tour pauses. A small "Resume tour" button appears. The clicked hex opens its detail panel.
+- **Toggle a filter mid-tour:** Tour cancels with a graceful fade-out of tour UI elements.
+- **Navigate away (scroll to case studies) mid-tour:** Tour pauses, resumes if user scrolls back up.
+
+### Loading and Fallback
+- **Initial load state:** Dark background (#0A0F1A) appears immediately (inline CSS). A minimal WT logo + subtle loading animation (three dots pulsing in WT Yellow) shows centre-screen while JS loads. The entrance animation then replaces this seamlessly.
+- **iframe embed failure:** Not handled in-app (SharePoint will show its own iframe error). The hosted URL should work standalone as a fallback.
+- **Slow connection:** GSAP and critical CSS load first (<50KB). Particle effects and case study images load lazily after the grid is interactive.
+
+### Touch / Tablet
+- **No hover on touch:** Hover glow effects are suppressed via `@media (hover: hover)`. First tap on a hex selects it (equivalent to click). The hex gets the glow/lift treatment on selection instead.
+- **Detail panel on tablet (768-1279px):** Overlays as a full-width panel from the bottom (slide up), rather than side panel, to preserve grid visibility.
+
+### Browser Navigation
+- **No URL state management.** This is an iframe embed — manipulating history would affect the parent SharePoint page. All state (active filters, open panels, tour progress) is in-memory JS only. Browser back button is not intercepted.
+
 ## Performance Requirements
 - First meaningful paint < 2 seconds
-- Total page weight < 2MB (excluding case study images)
+- Total page weight < 2MB gzipped (excluding case study images). GSAP core ~30KB, app JS + CSS ~100-200KB, fonts ~100KB, particle engine ~20KB. Budget is comfortable.
+- **Graceful degradation:** If `backdrop-filter` causes frame drops (detectable via `requestAnimationFrame` timing), fall back to solid semi-transparent backgrounds (no blur). Particle density halves on detected low performance.
 - Smooth 60fps animations
 - No layout shift after initial load
 - Works in Edge (primary — SharePoint users) and Chrome
@@ -404,4 +492,9 @@ A small collapsible control bar (icon in top-right or bottom-right of the hex se
 - Mobile-first responsive design (tablet minimum)
 - Real case study content (placeholders only)
 - Real sector-to-service mapping data (placeholders only)
+- Case study-to-service mapping data (placeholders only)
+- Real value statements per service (placeholder text)
+- Guided tour narrative copy (placeholder text)
 - Search functionality
+- Print/export functionality
+- Analytics/tracking
