@@ -164,6 +164,7 @@ a:hover { color: var(--wt-yellow); }
   margin-top: 2px; line-height: 1.2; max-width: 90%;
 }
 .hex--dimmed { opacity: 0.12; transform: scale(0.93); filter: grayscale(0.6); pointer-events: auto; }
+.hex--hidden { opacity: 0 !important; pointer-events: none !important; z-index: 0 !important; }
 .hex--selected::before { border-color: var(--wt-yellow) !important; }
 
 @media (hover: hover) {

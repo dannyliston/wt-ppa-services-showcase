@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderFilters(hexSection);
   initToggleControls(hexSection);
   initDetailPanel();
-  initHexInteractions(hexElements, grid);
+  initHexInteractions(hexElements, lineElements, crossLinks, grid);
   initGuidedTour(hexSection, hexElements);
 
   // Hide loader, show app
