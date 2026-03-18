@@ -167,6 +167,7 @@ export const contacts = [
   { id: 'kristian-lojszczyk', name: 'Kristian Lojszczyk', role: 'Associate Director, VIC', email: 'klojszczyk@wtpartnership.com.au' },
   { id: 'rachael-mccool', name: 'Rachael Mccool', role: 'Change Management Lead', email: 'rmccool@wtpartnership.com.au' },
   { id: 'latham-conley', name: 'Latham Conley', role: 'Risk Management Lead', email: 'lconley@wtpartnership.com.au' },
+  { id: 'pamela-doyle', name: 'Pamela Doyle', role: 'Senior Consultant', email: 'pdoyle@wtpartnership.com.au' },
 ];
 
 export function getPillarForService(serviceId) {

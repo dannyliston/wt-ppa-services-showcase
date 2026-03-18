@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <main>
       <section class="hex-section" id="hex-section">
         <canvas class="hex-canvas" id="particle-canvas"></canvas>
-        <div id="hex-grid-container" style="width:100%;height:700px;position:relative;z-index:2;"></div>
+        <div id="hex-grid-container" style="width:100%;max-width:100vw;height:700px;position:relative;z-index:2;overflow:hidden;"></div>
       </section>
 
       <div id="stats-container"></div>
