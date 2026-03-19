@@ -33,7 +33,7 @@ export const services = [
   },
   {
     id: 'cost-change-control', name: 'Cost & Change Control', categoryId: 'project-controls',
-    tags: ['process'], digital: false, contactId: 'adam-robinson',
+    tags: ['process'], digital: false, contactId: 'jared-cathcart',
     valueStatement: 'Tight cost controls and change management to protect your budget.',
     bullets: ['Cost planning and forecasting', 'Earned value management', 'Change request management', 'Variation tracking and assessment', 'Budget monitoring and reporting'],
     relatedIds: ['planning', 'governance-frameworks', 'reporting'],
@@ -82,14 +82,14 @@ export const services = [
   },
   {
     id: 'portfolio-management', name: 'Portfolio Management', categoryId: 'portfolio-program-mgmt',
-    tags: ['people', 'process'], digital: false, contactId: 'kristian-lojszczyk',
+    tags: ['people', 'process'], digital: false, contactId: 'jared-cathcart',
     valueStatement: 'Strategic portfolio oversight that maximises capital performance.',
     bullets: ['Portfolio prioritisation and optimisation', 'Capital planning', 'Benefits realisation', 'Portfolio performance monitoring'],
     relatedIds: ['program-management', 'reporting', 'maturity-assessments'],
   },
   {
     id: 'program-management', name: 'Program Management', categoryId: 'portfolio-program-mgmt',
-    tags: ['people', 'process'], digital: false, contactId: 'kristian-lojszczyk',
+    tags: ['people', 'process'], digital: false, contactId: 'jared-cathcart',
     valueStatement: 'Hands-on program leadership from mobilisation through to delivery.',
     bullets: ['Program setup and mobilisation', 'Program delivery oversight', 'Interdependency management', 'Stakeholder management'],
     relatedIds: ['portfolio-management', 'planning', 'change-management'],
@@ -138,14 +138,14 @@ export const services = [
   },
   {
     id: 'pm-frameworks', name: 'PM Frameworks', categoryId: 'governance-process',
-    tags: ['process'], digital: false, contactId: 'adam-robinson',
+    tags: ['process'], digital: false, contactId: 'jared-cathcart',
     valueStatement: 'Consistent project management methodology tailored to your organisation.',
     bullets: ['Project lifecycle definition', 'Stage gate criteria', 'Methodology selection and tailoring', 'RACI development'],
     relatedIds: ['governance-frameworks', 'gateway-reviews', 'templates-methodologies'],
   },
   {
     id: 'process-improvement', name: 'Process Improvement', categoryId: 'governance-process',
-    tags: ['process'], digital: false, contactId: 'adam-robinson',
+    tags: ['process'], digital: false, contactId: 'jared-cathcart',
     valueStatement: 'Streamlining processes to eliminate waste and improve outcomes.',
     bullets: ['Current-state process mapping', 'Efficiency analysis', 'Process redesign', 'Continuous improvement programs'],
     relatedIds: ['maturity-assessments', 'templates-methodologies', 'governance-frameworks'],
