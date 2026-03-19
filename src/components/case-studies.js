@@ -22,8 +22,21 @@ export function renderCaseStudies(container) {
           </div>
         `).join('')}
       </div>
+      <div class="case-studies__nav">
+        <button class="case-studies__nav-btn" id="cs-prev" aria-label="Previous">&#8249;</button>
+        <button class="case-studies__nav-btn" id="cs-next" aria-label="Next">&#8250;</button>
+      </div>
     </section>
   `;
+
+  // Scroll nav buttons
+  const scrollEl = container.querySelector('.case-studies__scroll');
+  container.querySelector('#cs-prev').addEventListener('click', () => {
+    scrollEl.scrollBy({ left: -320, behavior: 'smooth' });
+  });
+  container.querySelector('#cs-next').addEventListener('click', () => {
+    scrollEl.scrollBy({ left: 320, behavior: 'smooth' });
+  });
 
   // Modal
   modalEl = document.createElement('div');
