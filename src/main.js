@@ -7,6 +7,7 @@ import { renderFilters } from './components/filters.js';
 import { initToggleControls } from './components/toggle-controls.js';
 import { initGuidedTour } from './components/guided-tour.js';
 import { initParticles } from './components/particles.js';
+import { initZoom } from './components/zoom.js';
 import { renderStatsBar } from './components/stats-bar.js';
 import { renderCaseStudies } from './components/case-studies.js';
 import { renderContacts } from './components/contacts.js';
@@ -59,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initDetailPanel();
   initHexInteractions(hexElements, lineElements, crossLinks, grid);
   initGuidedTour(hexSection, hexElements);
+  initZoom(hexSection);
 
   // Hide loader, show app
   document.getElementById('loader').style.display = 'none';

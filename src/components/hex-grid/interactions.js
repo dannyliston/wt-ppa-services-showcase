@@ -89,8 +89,7 @@ export function applyFilterLayout(activeFilters) {
 function applyState(state) {
   const { selectedService, detailPanelOpen, toggles } = state;
 
-  const grid = document.getElementById('hex-grid');
-  if (grid) grid.classList.toggle('hex-grid--shifted', detailPanelOpen);
+  // Note: grid transform (shift + zoom) is managed by zoom.js via state subscription
 
   // Digital highlight
   _hexElements.forEach((el, id) => {
