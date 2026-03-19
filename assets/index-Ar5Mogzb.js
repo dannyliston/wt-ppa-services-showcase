@@ -59,8 +59,12 @@
           </div>
         `).join(``)}
       </div>
+      <div class="case-studies__nav">
+        <button class="case-studies__nav-btn" id="cs-prev" aria-label="Previous">&#8249;</button>
+        <button class="case-studies__nav-btn" id="cs-next" aria-label="Next">&#8250;</button>
+      </div>
     </section>
-  `,Da=document.createElement(`div`),Da.className=`case-modal`,Da.innerHTML=`<div class="case-modal__content"><button class="case-modal__close">&times;</button><div class="case-modal__body"></div></div>`,document.body.appendChild(Da),Da.querySelector(`.case-modal__close`).addEventListener(`click`,Aa),Da.addEventListener(`click`,e=>{e.target===Da&&Aa()}),e.querySelectorAll(`.case-card`).forEach(e=>{e.addEventListener(`click`,()=>{let t=Ea.find(t=>t.id===e.dataset.id);t&&ka(t)})})}function ka(e){let t=Da.querySelector(`.case-modal__body`);t.innerHTML=`
+  `;let t=e.querySelector(`.case-studies__scroll`);e.querySelector(`#cs-prev`).addEventListener(`click`,()=>{t.scrollBy({left:-320,behavior:`smooth`})}),e.querySelector(`#cs-next`).addEventListener(`click`,()=>{t.scrollBy({left:320,behavior:`smooth`})}),Da=document.createElement(`div`),Da.className=`case-modal`,Da.innerHTML=`<div class="case-modal__content"><button class="case-modal__close">&times;</button><div class="case-modal__body"></div></div>`,document.body.appendChild(Da),Da.querySelector(`.case-modal__close`).addEventListener(`click`,Aa),Da.addEventListener(`click`,e=>{e.target===Da&&Aa()}),e.querySelectorAll(`.case-card`).forEach(e=>{e.addEventListener(`click`,()=>{let t=Ea.find(t=>t.id===e.dataset.id);t&&ka(t)})})}function ka(e){let t=Da.querySelector(`.case-modal__body`);t.innerHTML=`
     <div class="detail-panel__badge" style="margin-bottom:16px">${e.sector}</div>
     <h2 class="detail-panel__name">${e.name}</h2>
     <p class="detail-panel__value">${e.location} — Placeholder case study details. Content to be provided.</p>
